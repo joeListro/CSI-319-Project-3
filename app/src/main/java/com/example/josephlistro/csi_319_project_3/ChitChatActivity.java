@@ -1,13 +1,17 @@
 package com.example.josephlistro.csi_319_project_3;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
 
-public class ChitChatActivity extends AppCompatActivity {
+public class ChitChatActivity extends SingleFragmentActivity {
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, ChitChatActivity.class);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chit_chat);
+    protected Fragment createFragment() {
+        return ChitChatFragment.newInstance();
     }
 }

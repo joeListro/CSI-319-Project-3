@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.util.Log;
 
 public abstract class VisibleFragment extends Fragment {
-
     private static final String TAG = "VisibleFragment";
 
     private BroadcastReceiver mOnShowNotification = new BroadcastReceiver() {

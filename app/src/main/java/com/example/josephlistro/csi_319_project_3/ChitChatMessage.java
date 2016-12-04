@@ -6,4 +6,7 @@ package com.example.josephlistro.csi_319_project_3;
 
 public class ChitChatMessage {
     // Container for messages
+    private String mSubject;
+    private String mId;
+    private String mUrl;
 }

@@ -10,6 +10,10 @@ public class HeckingShout {
     private String mMessageContent;
     private int mLikes;
     private int mDislikes;
+    private int mLat;
+    private int mLon;
+
+    public HeckingShout(){}
 
     public HeckingShout(String id, String time, String content, int likes, int dislikes)
     {
@@ -68,6 +72,14 @@ public class HeckingShout {
     {
         mDislikes = dislikes;
     }
+
+    public int getLat() { return mLat; }
+
+    public void setLat(int lat) { mLat = lat; }
+
+    public int getLon() { return mLon; }
+
+    public void setLon(int lon) { mLon = lon; }
 
     @Override
     public String toString()

@@ -13,6 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,6 +73,9 @@ public class YellLoudFragment extends Fragment {
             }
         });
 
+        mListHoldyRefresher.setRefreshing(true);
+        new DownloadMessages().execute();
+
         return v;
     }
 
@@ -108,13 +118,51 @@ public class YellLoudFragment extends Fragment {
 
     private class HeckHolder extends RecyclerView.ViewHolder
     {
+        private TextView mIdView, mTimeView, mContentView;
+
+        String mID;
+
+        private Button mLike, mDislike;
+
+
+
         public HeckHolder(View itemView){
             super(itemView);
 
+
+
+            //mIdView = (TextView) itemView.findViewById(R.id.text_id);
+            mTimeView = (TextView) itemView.findViewById(R.id.text_time);
+            mContentView = (TextView) itemView.findViewById(R.id.text_content);
+
+            mLike = (Button) itemView.findViewById(R.id.like);
+            mLike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    new SendLike().execute(mID);
+                }
+            });
+            mDislike = (Button) itemView.findViewById(R.id.dislike);
+            mDislike.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    new SendDislike().execute(mID);
+                }
+            });
+
         }
 
-        public void bindHeck(){
+        public void bindHeck(int pos){
 
+            HeckingShout hs = mShouts.get(pos);
+
+            mID = hs.getMessageID();
+
+            //mIdView.setText(hs.getMessageID());
+            mTimeView.setText(hs.getMessageTimestamp());
+            mContentView.setText(hs.getMessageContent());
         }
     }
 
@@ -134,62 +182,135 @@ public class YellLoudFragment extends Fragment {
         @Override
         public void onBindViewHolder(HeckHolder holder, int position){
 
-
+            holder.bindHeck(position);
         }
 
         @Override
         public int getItemCount(){
-            return 0;
+            if(mShouts != null){
+                return mShouts.size();
+            }
+            else{
+                return 0;
+            }
         }
     }
 
     private class DownloadMessages extends AsyncTask<Void, Void, String>{
         protected String doInBackground(Void... hidad) {
 
-            String strinnn = "";
-
             try {
-
-
                 String url = Uri.parse("https://www.stepoutnyc.com/chitchat")
                         .buildUpon()
                         .appendQueryParameter("key","champlainrocks1878")
                         .build()
                         .toString();
-                strinnn = getUrlString(url);
+                String strinnn = getUrlString(url);
+                Log.d("JSON MESSAGES BODY",strinnn);
+                JSONObject json = new JSONObject(strinnn);
 
+                JSONArray shouts = json.getJSONArray("messages");
 
+                mShouts = new ArrayList<HeckingShout>();
+
+                for(int i = 0; i < shouts.length(); i++){
+                    JSONObject shout = shouts.getJSONObject(i);
+
+                    HeckingShout iwannashoutoutheck = new HeckingShout();
+
+                    iwannashoutoutheck.setMessageID       (shout.getString("_id"));
+                    iwannashoutoutheck.setMessageTimestamp(shout.getString("date"));
+                    iwannashoutoutheck.setMessageContent  (shout.getString("message"));
+                    iwannashoutoutheck.setLikes           (shout.getInt("likes"));
+                    iwannashoutoutheck.setDislikes        (shout.getInt("dislikes"));
+
+                    mShouts.add(iwannashoutoutheck);
+                }
+
+            }catch(JSONException je){
 
             }catch(IOException io){
 
             }
-
-            return strinnn;
+            return new String();
         }
 
-        protected void onPostExecute(String bigolobj){
-
-            Log.d("meme",bigolobj);
+        protected void onPostExecute(String strin){
+            mHingAdapter.notifyDataSetChanged();
 
             mListHoldyRefresher.setRefreshing(false);
         }
     }
 
-    private class SendMessage extends AsyncTask<URL, Integer, Long>{
-        protected Long doInBackground(URL... urls) {
-            return new Long(0);
+    private class SendMessage extends AsyncTask<Void, Void, String>{
+        protected String doInBackground(Void... urls) {
+            return new String();
         }
     }
 
-    private class SendLike extends AsyncTask<URL, Integer, Long>{
-        protected Long doInBackground(URL... urls) {
-            return new Long(0);
+    private class SendLike extends AsyncTask<String, Void, String>{
+        protected String doInBackground(String... id) {
+
+            String status = "";
+            try {
+                String url = Uri.parse("https://www.stepoutnyc.com/chitchat/like/" + id[0])
+                        .buildUpon()
+                        .appendQueryParameter("key","champlainrocks1878")
+                        .build()
+                        .toString();
+                String strinnn = getUrlString(url);
+                Log.d("JSON MESSAGES BODY",strinnn);
+                JSONObject json = new JSONObject(strinnn);
+
+                status = json.getString("message");
+
+            }catch(JSONException je){
+
+                status = "JSONException";
+
+            }catch(IOException io){
+
+                status = "IOException";
+            }
+
+            return status;
+        }
+
+        protected void onPostExecute(String result){
+            Toast.makeText(getActivity(), "Like: " + result, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class SendDislike extends AsyncTask<URL, Integer, Long>{
-        protected Long doInBackground(URL... urls) {
-            return new Long(0);
+    private class SendDislike extends AsyncTask<String, Void, String>{
+        protected String doInBackground(String... id) {
+
+            String status = "";
+            try {
+                String url = Uri.parse("https://www.stepoutnyc.com/chitchat/dislike/" + id[0])
+                        .buildUpon()
+                        .appendQueryParameter("key","champlainrocks1878")
+                        .build()
+                        .toString();
+                String strinnn = getUrlString(url);
+                Log.d("JSON MESSAGES BODY",strinnn);
+                JSONObject json = new JSONObject(strinnn);
+
+                status = json.getString("message");
+
+            }catch(JSONException je){
+
+                status = "JSONException";
+
+            }catch(IOException io){
+
+                status = "IOException";
+            }
+
+            return status;
+        }
+
+        protected void onPostExecute(String result){
+            Toast.makeText(getActivity(), "Dislike: " + result, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 //Sleep well and shout out heck
@@ -27,8 +29,11 @@ public class YellLoudFragment extends Fragment {
     private static final String API_KEY = "champlainrocks1878";
 
     private RecyclerView mMessageList;
+    private HeckAdapter mHingAdapter;
 
     private SwipeRefreshLayout mListHoldyRefresher;
+
+    private ArrayList<HeckingShout> mShouts;
 
 
     @Override
@@ -42,6 +47,13 @@ public class YellLoudFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_yell_loud, container, false);
+
+        mMessageList = (RecyclerView) v.findViewById(R.id.gol_recycler_view);
+        mMessageList.setLayoutManager(new LinearLayoutManager(getActivity(),
+                                        LinearLayoutManager.VERTICAL,false));
+
+        mHingAdapter = new HeckAdapter();
+        mMessageList.setAdapter(mHingAdapter);
 
         mListHoldyRefresher = (SwipeRefreshLayout) v.findViewById(R.id.str);
 
@@ -145,6 +157,8 @@ public class YellLoudFragment extends Fragment {
                         .build()
                         .toString();
                 strinnn = getUrlString(url);
+
+
 
             }catch(IOException io){
 

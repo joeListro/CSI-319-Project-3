@@ -59,6 +59,7 @@ public class YellLoudFragment extends Fragment {
     private static final String API_KEY = "champlainrocks1878";
     private static final String CLIENT_YOU_BETTER_WANT_IT = "Boingo's big client bango";
 
+    //Array indicies for the gps coords in message json
     private static final int LAT = 0, LON = 1;
 
     private RecyclerView mMessageList;
@@ -108,7 +109,7 @@ public class YellLoudFragment extends Fragment {
         ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         updateLocation();
 
-        Log.d("LOCATION", Double.toString(mLongitude) + "," + Double.toString(mLatitude));
+        //Log.d("LOCATION", Double.toString(mLongitude) + "," + Double.toString(mLatitude));
 
 		/**********************************************************************
 		 * Create a listener to refresh the view layout on user down-swipe.
@@ -130,7 +131,7 @@ public class YellLoudFragment extends Fragment {
         mMessageBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                Log.d("keycode",Integer.toString(i));
+                //Log.d("keycode",Integer.toString(i));
                 if(i == 5){
                     mListHoldyRefresher.setRefreshing(true);
                     new SendMessage().execute(textView.getText().toString());
@@ -188,13 +189,21 @@ public class YellLoudFragment extends Fragment {
 
     //http://stackoverflow.com/questions/33865445/gps-location-provider-requires-access-fine-location-permission-for-android-6-0
     private void updateLocation(){
+        Log.d("hi","hi");
         if(getActivity().checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+            Log.d("hi","hi");
             mLM = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             //gets last known location, low energy use, low effort
             Location location = mLM.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            mLongitude = location.getLongitude();
-            mLatitude = location.getLatitude();
+            //handles mildy rare case where device has no known last location
+            if(!(location == null)) {
+                mLongitude = location.getLongitude();
+                mLatitude = location.getLatitude();
+            } else {
+                mLongitude = 0;
+                mLatitude = 0;
+            }
         }
     }
 
@@ -390,7 +399,7 @@ public class YellLoudFragment extends Fragment {
 	 */
     private class SendMessage extends AsyncTask<String, Void, String>{
         protected String doInBackground(String... message) {
-
+            updateLocation();
             try {
                 /* Build URL string, strUrl */
                 String urlSpec = Uri.parse("https://www.stepoutnyc.com/chitchat")

@@ -16,12 +16,12 @@ public class HeckingShout {
     private int mLat;
     private int mLon;
 
-	/******************************************************
+	/**************************************************************************
      * Default Constructor
      */
     public HeckingShout(){}
 
-	/******************************************************
+	/**************************************************************************
      * Constructor for HeckingShout Object
      *
      * @param id        - The unique ID of the ChitChat message
@@ -39,8 +39,9 @@ public class HeckingShout {
         mDislikes = dislikes;
     }
 
-	/******************************************************
-     * Get HeckingObject's ChitChat message's unique ID.
+	/**************************************************************************
+     * getMessageID
+     *      - Get HeckingObject's ChitChat message's unique ID.
      *
      * @return  - The message's unique ID
      */
@@ -49,8 +50,9 @@ public class HeckingShout {
         return mMessageID;
     }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's unique ID.
+	/**************************************************************************
+     * setMessageID
+     *      - Set HeckingObject's ChitChat message's unique ID.
      *
      * @param id        - A unique ChitChat message ID
      */
@@ -58,8 +60,9 @@ public class HeckingShout {
         mMessageID = id;
     }
 
-	/******************************************************
-     * Get HeckingObject's ChitChat message's timestamp.
+	/**************************************************************************
+     * getMessageTimestamp
+     *      - Get HeckingObject's ChitChat message's timestamp.
      *
      * @return          - The message's timestamp.
      */
@@ -68,8 +71,9 @@ public class HeckingShout {
         return mTimestamp;
     }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's timestamp.
+	/**************************************************************************
+     * setMessageTimestamp
+     *      - Set HeckingObject's ChitChat message's timestamp.
      *
      * @param time      - The timestamp when the message was created.
      */
@@ -78,8 +82,9 @@ public class HeckingShout {
         mTimestamp = time;
     }
 
-	/******************************************************
-     * Get HeckingObject's ChitChat message's body.
+	/**************************************************************************
+     * getMessageContent
+     *      - Get HeckingObject's ChitChat message's body.
      *
      * @return          - The message's content / body
      */
@@ -88,8 +93,9 @@ public class HeckingShout {
         return mMessageContent;
     }
 
-	/**************************************************
-     * Set HeckingObject's ChitChat message's body.
+	/**********************************************************************
+     * setMessageContent
+     *      - Set HeckingObject's ChitChat message's body.
      *
      * @param content   - The message body's text content.
      */
@@ -98,8 +104,9 @@ public class HeckingShout {
         mMessageContent = content;
     }
 
-	/******************************************************
-     * Get HeckingObject's ChitChat message's number of likes.
+	/**************************************************************************
+     * getLikes
+     *      - Get HeckingObject's ChitChat message's number of likes.
      *
      * @return          - The message's number of likes.
      */
@@ -108,8 +115,9 @@ public class HeckingShout {
         return mLikes;
     }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's number of likes.
+	/**************************************************************************
+     * setLikes
+     *      - Set HeckingObject's ChitChat message's number of likes.
      *
      * @param likes     - The message's number of likes.
      */
@@ -118,8 +126,9 @@ public class HeckingShout {
         mLikes = likes;
     }
 
-    /******************************************************
-     * Get HeckingObject's ChitChat message's number of dislikes.
+    /**************************************************************************
+     * getDislikes
+     *      - Get HeckingObject's ChitChat message's number of dislikes.
      *
      * @return          - The message's number of dislikes.
      */
@@ -128,8 +137,9 @@ public class HeckingShout {
         return mDislikes;
     }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's number of dislikes.
+	/**************************************************************************
+     * setDislikes
+     *      - Set HeckingObject's ChitChat message's number of dislikes.
      *
      * @param dislikes  -  The message's number of dislikes.
      */
@@ -138,37 +148,42 @@ public class HeckingShout {
         mDislikes = dislikes;
     }
 
-    /******************************************************
-     * Get HeckingObject's ChitChat message's latitude.
+    /**************************************************************************
+     * getLat
+     *      - Get HeckingObject's ChitChat message's latitude.
      *
      * @return          - The message's latitude.
      */
     public int getLat() { return mLat; }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's latitude.
+	/**************************************************************************
+     * setLat
+     *      - Set HeckingObject's ChitChat message's latitude.
      *
      * @param lat       - The message's latitude.
      */
     public void setLat(int lat) { mLat = lat; }
 
-    /******************************************************
-     * Get HeckingObject's ChitChat message's longitude.
+    /**************************************************************************
+     * getLon
+     *      - Get HeckingObject's ChitChat message's longitude.
      *
      * @return          - The message's longitude.
      */
     public int getLon() { return mLon; }
 
-	/******************************************************
-     * Set HeckingObject's ChitChat message's longitude.
+	/**************************************************************************
+     * setLon
+     *      - Set HeckingObject's ChitChat message's longitude.
      *
      * @param lon       - The message's longitude.
      */
     public void setLon(int lon) { mLon = lon; }
 
-	/******************************************************
-     * Return a String containing the message content of
-     *  this HeckingObject.
+	/**************************************************************************
+     * toString
+     *      - Return a String containing the message content of
+     *          this HeckingObject.
      *
      * @return          - Message's content.
      */

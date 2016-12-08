@@ -2,6 +2,7 @@ package com.upmoon.alex.moonyodel;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -110,6 +111,9 @@ public class YellLoudFragment extends Fragment {
         updateLocation();
 
         //Log.d("LOCATION", Double.toString(mLongitude) + "," + Double.toString(mLatitude));
+
+        //http://stackoverflow.com/questions/12704009/setting-the-orientation-for-only-1-fragment-in-my-activity-while-the-rest-is-in
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		/**********************************************************************
 		 * Create a listener to refresh the view layout on user down-swipe.

@@ -85,6 +85,7 @@ public class YellLoudFragment extends Fragment {
                 Log.d("keycode",Integer.toString(i));
                 if(i == 5){
                     new SendMessage().execute(textView.getText().toString());
+                    textView.setText("Message");
                 }
 
                 return false;

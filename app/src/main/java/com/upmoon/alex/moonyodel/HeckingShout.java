@@ -16,6 +16,8 @@ public class HeckingShout {
     private double mLat;
     private double mLon;
     private boolean mKnowsWhereIam = false;
+    private boolean mFelt = false;
+    private int mLDlazyInt = 0;
 
 	/**************************************************************************
      * Default Constructor
@@ -166,6 +168,14 @@ public class HeckingShout {
     public boolean isHasLoc() { return mKnowsWhereIam; }
 
     public void hasLoc() { mKnowsWhereIam = true; }
+
+    public boolean isHasFelt() { return mFelt; }
+
+    public void hasFelt() { mFelt = true; }
+
+    public int getmLDlazyInt() { return mLDlazyInt; }
+
+    public void setmLDlazyInt(int i) { mLDlazyInt = i; }
 
 	/**************************************************************************
      * toString

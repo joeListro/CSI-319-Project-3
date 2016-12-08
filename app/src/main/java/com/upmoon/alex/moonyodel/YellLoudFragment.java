@@ -217,15 +217,14 @@ public class YellLoudFragment extends Fragment {
 	 */
     private class HeckHolder extends RecyclerView.ViewHolder
     {
+        private int mHeck;
+
         private TextView mIdView, mTimeView, mContentView, mGPSView, mLikesView;
 
         private String mID;
 
         private Button mLike, mDislike;
 
-        private int mLikes, mDislikes;
-
-        private boolean mChoice = false;
 
 		/**********************************************************************
 		 * HeckHolder Constructor
@@ -243,16 +242,20 @@ public class YellLoudFragment extends Fragment {
             mGPSView = (TextView) itemView.findViewById(R.id.gpsloc);
 
             mLike = (Button) itemView.findViewById(R.id.like);
+
+            mLike.setBackgroundResource(android.R.drawable.btn_default);
 			/** Listen for like button presses and SendLike for each press */
             mLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-                    if(!mChoice) {
+                    if(!(mShouts.get(mHeck).isHasFelt())) {
                         new SendLike().execute(mID);
+                        mShouts.get(mHeck).setmLDlazyInt(1);
                         mLike.setBackgroundColor(Color.parseColor("Yellow"));
-                        mLikesView.setText("L: " + Integer.toString(mLikes + 1) + " D: " + Integer.toString(mDislikes));
-                        mChoice = true;
+                        mShouts.get(mHeck).setLikes(mShouts.get(mHeck).getLikes() + 1);
+                        mLikesView.setText("L: " + Integer.toString(mShouts.get(mHeck).getLikes()) + " D: " + Integer.toString(mShouts.get(mHeck).getDislikes()));
+                        mShouts.get(mHeck).hasFelt();
                     } else {
                         Toast.makeText(getActivity(), "You already chose dummy!", Toast.LENGTH_SHORT).show();
                     }
@@ -260,17 +263,19 @@ public class YellLoudFragment extends Fragment {
             });
             mDislike = (Button) itemView.findViewById(R.id.dislike);
 			/** Listen for dislike button presses and SendDislike for each press */
+            mDislike.setBackgroundResource(android.R.drawable.btn_default);
             mDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-                    if(!mChoice) {
+                    if(!(mShouts.get(mHeck).isHasFelt())) {
                         new SendDislike().execute(mID);
+                        mShouts.get(mHeck).setmLDlazyInt(2);
                         mDislike.setBackgroundColor(Color.parseColor("Yellow"));
-                        mLikesView.setText("L: " + Integer.toString(mLikes) + " D: " + Integer.toString(mDislikes + 1));
-                        mChoice = true;
-
-                    }else {
+                        mShouts.get(mHeck).setDislikes(mShouts.get(mHeck).getDislikes() + 1);
+                        mLikesView.setText("L: " + Integer.toString(mShouts.get(mHeck).getLikes()) + " D: " + Integer.toString(mShouts.get(mHeck).getDislikes()));
+                        mShouts.get(mHeck).hasFelt();
+                    } else {
                         Toast.makeText(getActivity(), "You already chose dummy!", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -286,6 +291,8 @@ public class YellLoudFragment extends Fragment {
 		 */
         public void bindHeck(int pos){
 
+            mHeck = pos;
+
             HeckingShout hs = mShouts.get(pos);
 
             mID = hs.getMessageID();
@@ -293,10 +300,18 @@ public class YellLoudFragment extends Fragment {
             mTimeView.setText(hs.getMessageTimestamp());
             mContentView.setText(hs.getMessageContent());
 
-            mLikes = hs.getLikes();
-            mDislikes = hs.getDislikes();
+            // Absolutely poor show solution to a problem I didn't know could happen
+            if(!(mShouts.get(mHeck).isHasFelt())) {
+                mLike.setBackgroundResource(android.R.drawable.btn_default);
+                mDislike.setBackgroundResource(android.R.drawable.btn_default);
+            } else if(mShouts.get(mHeck).getmLDlazyInt() == 1){
+                mLike.setBackgroundColor(Color.parseColor("Yellow"));
+            } else if(mShouts.get(mHeck).getmLDlazyInt() == 2){
+                mDislike.setBackgroundColor(Color.parseColor("Yellow"));
+            }
 
-            mLikesView.setText("L: " + Integer.toString(mLikes) + " D: " + Integer.toString(mDislikes));
+
+            mLikesView.setText("L: " + Integer.toString(mShouts.get(mHeck).getLikes()) + " D: " + Integer.toString(mShouts.get(mHeck).getDislikes()));
 
             if(hs.isHasLoc()){
                 mGPSView.setText("Lat: " + Double.toString(hs.getLat()) + " Lon: " + Double.toString(hs.getLon()));

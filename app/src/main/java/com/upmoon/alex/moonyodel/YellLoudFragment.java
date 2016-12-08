@@ -84,6 +84,7 @@ public class YellLoudFragment extends Fragment {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 Log.d("keycode",Integer.toString(i));
                 if(i == 5){
+                    mListHoldyRefresher.setRefreshing(true);
                     new SendMessage().execute(textView.getText().toString());
                     textView.setText("Message");
                 }
@@ -305,7 +306,7 @@ public class YellLoudFragment extends Fragment {
         }
 
         protected void onPostExecute(String str){
-            mListHoldyRefresher.setRefreshing(true);
+
             new DownloadMessages().execute();
 
             mListHoldyRefresher.setRefreshing(true);

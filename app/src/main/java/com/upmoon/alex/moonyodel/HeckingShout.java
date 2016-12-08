@@ -145,6 +145,11 @@ public class HeckingShout {
      */
     public int getLat() { return mLat; }
 
+	/******************************************************
+     * Set HeckingObject's ChitChat message's latitude.
+     *
+     * @param lat       - The message's latitude.
+     */
     public void setLat(int lat) { mLat = lat; }
 
     /******************************************************

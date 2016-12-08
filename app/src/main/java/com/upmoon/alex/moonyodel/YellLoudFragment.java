@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -242,9 +241,49 @@ public class YellLoudFragment extends Fragment {
         }
     }
 
-    private class SendMessage extends AsyncTask<Void, Void, String>{
-        protected String doInBackground(Void... urls) {
+    /* Yell a HeckingShout to the server */
+    private class SendMessage extends AsyncTask<String, Void, String>{
+        protected String doInBackground(String... id) {
+            try {
+                /* Build new JSONObject from the HeckingShout */
+                JSONObject newShout = new JSONObject();
+                HeckingShout shout = mShouts.get(Integer.getInteger(id[0]));
+                newShout.put("_id", shout.getMessageID());
+                newShout.put("date", shout.getMessageTimestamp());
+                newShout.put("message", shout.getMessageContent());
+                newShout.put("likes", 0);
+                newShout.put("dislikes", 0);
+
+                /* Build URL string, strUrl */
+                String url = Uri.parse("https://www.stepoutnyc.com/chitchat")
+                        .buildUpon()
+                        .appendQueryParameter("key","champlainrocks1878")
+                        .build()
+                        .toString();
+                String strUrl = getUrlString(url);
+                Log.d("JSON MESSAGES BODY", strUrl);
+
+                /* Load the JSONArray of existing HeckingShouts from the URL string, strUrl */
+                JSONObject json = new JSONObject(strUrl);
+                JSONArray shouts = json.getJSONArray("messages");
+
+                /* Yell the new HeckingShout into the existing JSONArray  on the server */
+                shouts.put(newShout);
+
+            } catch(JSONException je){
+                // JSONException thrown
+                Log.d("YellLoudFragment:", "JSONException thrown.");
+            } catch(IOException io) {
+                // IOException thrown
+                Log.d("YellLoudFragment:","IOException thrown.");
+            }
+
             return new String();
+        }
+
+        protected void onPostExecute(String str){
+            mHingAdapter.notifyDataSetChanged(); // Does this refresh the local feed?
+            mListHoldyRefresher.setRefreshing(false);
         }
     }
 

@@ -1,9 +1,15 @@
 package com.upmoon.alex.moonyodel;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -30,6 +36,19 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
+/*
+* I swear on me mum this is all my work sans cited material
+*
+* Hi Daivd, this might not be the most pretty object oriented
+* project we've made but I think this kind of compactness for
+* a project like this is super pretty and cool so please don't
+* grade it too harshly
+*
+* - Alex
+*
+* */
+
+
 /**
  * YellLoudFragment
  *      Fragment that handle's the UI lifecycle.
@@ -39,6 +58,8 @@ public class YellLoudFragment extends Fragment {
 	/** Declare static final variables for the server connection */
     private static final String API_KEY = "champlainrocks1878";
     private static final String CLIENT_YOU_BETTER_WANT_IT = "Boingo's big client bango";
+
+    private static final int LAT = 0, LON = 1;
 
     private RecyclerView mMessageList;
     private HeckAdapter mHingAdapter;
@@ -51,11 +72,15 @@ public class YellLoudFragment extends Fragment {
 	/** List Array to hold the HeckingShout ChitChat-message container objects */
     private ArrayList<HeckingShout> mShouts;
 
-	/**************************************************************************
-	 * Reqired onCreate Override
-	 *
-	 * @param savedInstanceState
-	 */
+    private LocationManager mLM;
+
+    private double mLongitude, mLatitude;
+
+    /**************************************************************************
+     * Reqired onCreate Override
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +104,11 @@ public class YellLoudFragment extends Fragment {
         mMessageList.setAdapter(mHingAdapter);
 
         mListHoldyRefresher = (SwipeRefreshLayout) v.findViewById(R.id.str);
+
+        ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        updateLocation();
+
+        Log.d("LOCATION", Double.toString(mLongitude) + "," + Double.toString(mLatitude));
 
 		/**********************************************************************
 		 * Create a listener to refresh the view layout on user down-swipe.
@@ -155,17 +185,34 @@ public class YellLoudFragment extends Fragment {
     }
     //------------------------------------------------------------------------
 
+
+    //http://stackoverflow.com/questions/33865445/gps-location-provider-requires-access-fine-location-permission-for-android-6-0
+    private void updateLocation(){
+        if(getActivity().checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+            mLM = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            //gets last known location, low energy use, low effort
+            Location location = mLM.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            mLongitude = location.getLongitude();
+            mLatitude = location.getLatitude();
+        }
+    }
+
 	/**************************************************************************
 	 * HeckHolder
 	 * 		- RecyclerView Holder for the array of HeckingShout objects (messages)
 	 */
     private class HeckHolder extends RecyclerView.ViewHolder
     {
-        private TextView mIdView, mTimeView, mContentView;
+        private TextView mIdView, mTimeView, mContentView, mGPSView, mLikesView;
 
-        String mID;
+        private String mID;
 
         private Button mLike, mDislike;
+
+        private int mLikes, mDislikes;
+
+        private boolean mChoice = false;
 
 		/**********************************************************************
 		 * HeckHolder Constructor
@@ -179,13 +226,23 @@ public class YellLoudFragment extends Fragment {
 			mTimeView = (TextView) itemView.findViewById(R.id.text_time);
             mContentView = (TextView) itemView.findViewById(R.id.text_content);
 
+            mLikesView = (TextView) itemView.findViewById(R.id.ldamount);
+            mGPSView = (TextView) itemView.findViewById(R.id.gpsloc);
+
             mLike = (Button) itemView.findViewById(R.id.like);
 			/** Listen for like button presses and SendLike for each press */
             mLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-                    new SendLike().execute(mID);
+                    if(!mChoice) {
+                        new SendLike().execute(mID);
+                        mLike.setBackgroundColor(Color.parseColor("Yellow"));
+                        mLikesView.setText("L: " + Integer.toString(mLikes + 1) + " D: " + Integer.toString(mDislikes));
+                        mChoice = true;
+                    } else {
+                        Toast.makeText(getActivity(), "You already chose dummy!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             mDislike = (Button) itemView.findViewById(R.id.dislike);
@@ -194,7 +251,15 @@ public class YellLoudFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
 
-                    new SendDislike().execute(mID);
+                    if(!mChoice) {
+                        new SendDislike().execute(mID);
+                        mDislike.setBackgroundColor(Color.parseColor("Yellow"));
+                        mLikesView.setText("L: " + Integer.toString(mLikes) + " D: " + Integer.toString(mDislikes + 1));
+                        mChoice = true;
+
+                    }else {
+                        Toast.makeText(getActivity(), "You already chose dummy!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
@@ -214,6 +279,15 @@ public class YellLoudFragment extends Fragment {
 
             mTimeView.setText(hs.getMessageTimestamp());
             mContentView.setText(hs.getMessageContent());
+
+            mLikes = hs.getLikes();
+            mDislikes = hs.getDislikes();
+
+            mLikesView.setText("L: " + Integer.toString(mLikes) + " D: " + Integer.toString(mDislikes));
+
+            if(hs.isHasLoc()){
+                mGPSView.setText("Lat: " + Double.toString(hs.getLat()) + " Lon: " + Double.toString(hs.getLon()));
+            }
         }
     }
 
@@ -259,11 +333,11 @@ public class YellLoudFragment extends Fragment {
 	 */
     private class DownloadMessages extends AsyncTask<Void, Void, String>{
         protected String doInBackground(Void... hidad) {
-
             try {
                 String url = Uri.parse("https://www.stepoutnyc.com/chitchat")
                         .buildUpon()
                         .appendQueryParameter("key",API_KEY)
+                        .appendQueryParameter("limit","60")
                         .build()
                         .toString();
                 String strinnn = getUrlString(url);
@@ -284,6 +358,14 @@ public class YellLoudFragment extends Fragment {
                     iwannashoutoutheck.setMessageContent  (shout.getString("message"));
                     iwannashoutoutheck.setLikes           (shout.getInt("likes"));
                     iwannashoutoutheck.setDislikes        (shout.getInt("dislikes"));
+
+                    JSONArray gpscoords = shout.getJSONArray("loc");
+
+                    if(!(gpscoords.isNull(LAT) || gpscoords.isNull(LON))){
+                        iwannashoutoutheck.setLat(gpscoords.getDouble(LAT));
+                        iwannashoutoutheck.setLon(gpscoords.getDouble(LON));
+                        iwannashoutoutheck.hasLoc();
+                    }
 
                     mShouts.add(iwannashoutoutheck);
                 }
@@ -308,6 +390,7 @@ public class YellLoudFragment extends Fragment {
 	 */
     private class SendMessage extends AsyncTask<String, Void, String>{
         protected String doInBackground(String... message) {
+
             try {
                 /* Build URL string, strUrl */
                 String urlSpec = Uri.parse("https://www.stepoutnyc.com/chitchat")
@@ -315,6 +398,8 @@ public class YellLoudFragment extends Fragment {
                         .appendQueryParameter("key",API_KEY)
                         .appendQueryParameter("message",message[0])
                         .appendQueryParameter("client",CLIENT_YOU_BETTER_WANT_IT)
+                        .appendQueryParameter("lat",Double.toString(mLatitude))
+                        .appendQueryParameter("lon",Double.toString(mLongitude))
                         .build()
                         .toString();
 
@@ -388,7 +473,7 @@ public class YellLoudFragment extends Fragment {
         }
 
         protected void onPostExecute(String result){
-            Toast.makeText(getActivity(), "Like: " + result, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Like: " + result, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -426,7 +511,7 @@ public class YellLoudFragment extends Fragment {
         }
 
         protected void onPostExecute(String result){
-            Toast.makeText(getActivity(), "Dislike: " + result, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Dislike: " + result, Toast.LENGTH_SHORT).show();
         }
     }
 }

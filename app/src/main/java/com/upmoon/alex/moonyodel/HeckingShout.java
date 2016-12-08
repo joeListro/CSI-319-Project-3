@@ -13,31 +13,14 @@ public class HeckingShout {
     private String mMessageContent;
     private int mLikes;
     private int mDislikes;
-    private int mLat;
-    private int mLon;
+    private double mLat;
+    private double mLon;
+    private boolean mKnowsWhereIam = false;
 
 	/**************************************************************************
      * Default Constructor
      */
     public HeckingShout(){}
-
-	/**************************************************************************
-     * Constructor for HeckingShout Object
-     *
-     * @param id        - The unique ID of the ChitChat message
-     * @param time      - Timestamp of when the message was created
-     * @param content   - The message body
-     * @param likes     - Number of likes the message has received
-     * @param dislikes  - Number of likes the message has received
-     */
-    public HeckingShout(String id, String time, String content, int likes, int dislikes)
-    {
-        mMessageID = id;
-        mTimestamp = time;
-        mMessageContent = content;
-        mLikes = likes;
-        mDislikes = dislikes;
-    }
 
 	/**************************************************************************
      * getMessageID
@@ -154,7 +137,7 @@ public class HeckingShout {
      *
      * @return          - The message's latitude.
      */
-    public int getLat() { return mLat; }
+    public double getLat() { return mLat; }
 
 	/**************************************************************************
      * setLat
@@ -162,7 +145,7 @@ public class HeckingShout {
      *
      * @param lat       - The message's latitude.
      */
-    public void setLat(int lat) { mLat = lat; }
+    public void setLat(double lat) { mLat = lat; }
 
     /**************************************************************************
      * getLon
@@ -170,7 +153,7 @@ public class HeckingShout {
      *
      * @return          - The message's longitude.
      */
-    public int getLon() { return mLon; }
+    public double getLon() { return mLon; }
 
 	/**************************************************************************
      * setLon
@@ -178,7 +161,11 @@ public class HeckingShout {
      *
      * @param lon       - The message's longitude.
      */
-    public void setLon(int lon) { mLon = lon; }
+    public void setLon(double lon) { mLon = lon; }
+
+    public boolean isHasLoc() { return mKnowsWhereIam; }
+
+    public void hasLoc() { mKnowsWhereIam = true; }
 
 	/**************************************************************************
      * toString

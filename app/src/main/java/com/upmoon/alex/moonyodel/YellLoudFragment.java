@@ -267,7 +267,7 @@ public class YellLoudFragment extends Fragment {
                         .build()
                         .toString();
                 String strinnn = getUrlString(url);
-                Log.d("JSON MESSAGES BODY",strinnn);
+                //Log.d("JSON MESSAGES BODY",strinnn);
                 JSONObject json = new JSONObject(strinnn);
 
                 JSONArray shouts = json.getJSONArray("messages");
@@ -341,7 +341,7 @@ public class YellLoudFragment extends Fragment {
                 }
             } catch(IOException io) {
                 // IOException thrown
-                Log.d("YellLoudFragment:","IOException thrown.");
+                //Log.d("YellLoudFragment:","IOException thrown.");
             }
 
             return new String();
@@ -370,7 +370,7 @@ public class YellLoudFragment extends Fragment {
                         .build()
                         .toString();
                 String strinnn = getUrlString(url);
-                Log.d("JSON MESSAGES BODY",strinnn);
+                //Log.d("JSON MESSAGES BODY",strinnn);
                 JSONObject json = new JSONObject(strinnn);
 
                 status = json.getString("message");
@@ -407,7 +407,7 @@ public class YellLoudFragment extends Fragment {
                         .build()
                         .toString();
                 String strinnn = getUrlString(url);
-                Log.d("JSON MESSAGES BODY",strinnn);
+                //Log.d("JSON MESSAGES BODY",strinnn);
 
 				JSONObject json = new JSONObject(strinnn);
 

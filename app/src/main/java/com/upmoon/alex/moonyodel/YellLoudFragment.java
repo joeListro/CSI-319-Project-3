@@ -30,34 +30,45 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-//Sleep well and shout out heck
-
+/**
+ * YellLoudFragment
+ *      Fragment that handle's the UI lifecycle.
+ */
 public class YellLoudFragment extends Fragment {
 
+	/** Declare static final variables for the server connection */
     private static final String API_KEY = "champlainrocks1878";
-
     private static final String CLIENT_YOU_BETTER_WANT_IT = "Boingo's big client bango";
 
     private RecyclerView mMessageList;
     private HeckAdapter mHingAdapter;
 
+	private EditText mMessageBox;
+
+	/** Refresh the layout on user down-swipe */
     private SwipeRefreshLayout mListHoldyRefresher;
 
+	/** List Array to hold the HeckingShout ChitChat-message container objects */
     private ArrayList<HeckingShout> mShouts;
 
-    private EditText mMessageBox;
-
-
+	/**************************************************************************
+	 * Reqired onCreate Override
+	 *
+	 * @param savedInstanceState
+	 */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
 
+	/**************************************************************************
+	 * Create the Main Fragment View
+	 */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        /** Inflate the layout for this fragment */
         View v = inflater.inflate(R.layout.fragment_yell_loud, container, false);
 
         mMessageList = (RecyclerView) v.findViewById(R.id.gol_recycler_view);
@@ -69,6 +80,9 @@ public class YellLoudFragment extends Fragment {
 
         mListHoldyRefresher = (SwipeRefreshLayout) v.findViewById(R.id.str);
 
+		/**********************************************************************
+		 * Create a listener to refresh the view layout on user down-swipe.
+		 */
         mListHoldyRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -78,6 +92,10 @@ public class YellLoudFragment extends Fragment {
             }
         });
 
+		/**********************************************************************
+		 *	Create a listener to submit the text in the EditText box as a new
+		 *		ChitChat message.
+		 */
         mMessageBox = (EditText) v.findViewById(R.id.editText);
         mMessageBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -93,6 +111,7 @@ public class YellLoudFragment extends Fragment {
             }
         });
 
+		/** Refresh the view after the addition of a new message */
         mListHoldyRefresher.setRefreshing(true);
         new DownloadMessages().execute();
 
@@ -136,6 +155,10 @@ public class YellLoudFragment extends Fragment {
     }
     //------------------------------------------------------------------------
 
+	/**************************************************************************
+	 * HeckHolder
+	 * 		- RecyclerView Holder for the array of HeckingShout objects (messages)
+	 */
     private class HeckHolder extends RecyclerView.ViewHolder
     {
         private TextView mIdView, mTimeView, mContentView;
@@ -144,16 +167,20 @@ public class YellLoudFragment extends Fragment {
 
         private Button mLike, mDislike;
 
+		/**********************************************************************
+		 * HeckHolder Constructor
+		 * 		- Initialize HeckHolder
+		 *
+		 * @param itemView
+		 */
         public HeckHolder(View itemView){
             super(itemView);
 
-
-
-            //mIdView = (TextView) itemView.findViewById(R.id.text_id);
-            mTimeView = (TextView) itemView.findViewById(R.id.text_time);
+			mTimeView = (TextView) itemView.findViewById(R.id.text_time);
             mContentView = (TextView) itemView.findViewById(R.id.text_content);
 
             mLike = (Button) itemView.findViewById(R.id.like);
+			/** Listen for like button presses and SendLike for each press */
             mLike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -162,6 +189,7 @@ public class YellLoudFragment extends Fragment {
                 }
             });
             mDislike = (Button) itemView.findViewById(R.id.dislike);
+			/** Listen for dislike button presses and SendDislike for each press */
             mDislike.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -172,24 +200,35 @@ public class YellLoudFragment extends Fragment {
 
         }
 
+		/**********************************************************************
+		 * bindHeck
+		 * 		- Create a new message in the mShouts array from a HeckingShout object.
+		 *
+		 * @param pos	- The index after the last populated index in mShouts.
+		 */
         public void bindHeck(int pos){
 
             HeckingShout hs = mShouts.get(pos);
 
             mID = hs.getMessageID();
 
-            //mIdView.setText(hs.getMessageID());
             mTimeView.setText(hs.getMessageTimestamp());
             mContentView.setText(hs.getMessageContent());
         }
     }
 
+	/**************************************************************************
+	 * HeckAdapter
+	 * 		- Populate the fragment view with the messages in HeckingShouts from HeckHolder
+	 */
     private class HeckAdapter extends RecyclerView.Adapter<HeckHolder>{
 
+		/** Empty Default Constructor */
         public HeckAdapter(){
 
         }
 
+		/** Upon creation, inflate the view */
         @Override
         public HeckHolder onCreateViewHolder(ViewGroup parent, int viewType){
             LayoutInflater LI = LayoutInflater.from(getActivity());
@@ -197,12 +236,13 @@ public class YellLoudFragment extends Fragment {
             return new HeckHolder(view);
         }
 
+		/** Bing position index in mShouts to HeckHolder holder */
         @Override
         public void onBindViewHolder(HeckHolder holder, int position){
-
             holder.bindHeck(position);
         }
 
+		/** Return the number of messages (HeckingShouts) in mShouts array */
         @Override
         public int getItemCount(){
             if(mShouts != null){
@@ -214,6 +254,9 @@ public class YellLoudFragment extends Fragment {
         }
     }
 
+	/**************************************************************************
+	 * Download Messages from the server in the background asynchronously
+	 */
     private class DownloadMessages extends AsyncTask<Void, Void, String>{
         protected String doInBackground(Void... hidad) {
 
@@ -260,7 +303,9 @@ public class YellLoudFragment extends Fragment {
         }
     }
 
-    /* Yell a HeckingShout to the server */
+	/**************************************************************************
+	 * Yell a HeckingShout to the server in the background asynchronously
+	 */
     private class SendMessage extends AsyncTask<String, Void, String>{
         protected String doInBackground(String... message) {
             try {
@@ -294,9 +339,6 @@ public class YellLoudFragment extends Fragment {
                 } finally {
                     connection.disconnect();
                 }
-
-
-
             } catch(IOException io) {
                 // IOException thrown
                 Log.d("YellLoudFragment:","IOException thrown.");
@@ -313,6 +355,10 @@ public class YellLoudFragment extends Fragment {
         }
     }
 
+	/**************************************************************************
+	 * SendLike
+	 * 		- Notify the server about a message like.
+	 */
     private class SendLike extends AsyncTask<String, Void, String>{
         protected String doInBackground(String... id) {
 
@@ -346,6 +392,10 @@ public class YellLoudFragment extends Fragment {
         }
     }
 
+	/**************************************************************************
+	 * SendDislike
+	 * 		- Notify the server about a message dislike.
+	 */
     private class SendDislike extends AsyncTask<String, Void, String>{
         protected String doInBackground(String... id) {
 
@@ -358,7 +408,8 @@ public class YellLoudFragment extends Fragment {
                         .toString();
                 String strinnn = getUrlString(url);
                 Log.d("JSON MESSAGES BODY",strinnn);
-                JSONObject json = new JSONObject(strinnn);
+
+				JSONObject json = new JSONObject(strinnn);
 
                 status = json.getString("message");
 

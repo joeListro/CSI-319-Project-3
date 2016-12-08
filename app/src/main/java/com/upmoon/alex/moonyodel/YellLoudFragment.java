@@ -7,12 +7,14 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,12 +36,16 @@ public class YellLoudFragment extends Fragment {
 
     private static final String API_KEY = "champlainrocks1878";
 
+    private static final String CLIENT_YOU_BETTER_WANT_IT = "Boingo's big client bango";
+
     private RecyclerView mMessageList;
     private HeckAdapter mHingAdapter;
 
     private SwipeRefreshLayout mListHoldyRefresher;
 
     private ArrayList<HeckingShout> mShouts;
+
+    private EditText mMessageBox;
 
 
     @Override
@@ -69,6 +75,19 @@ public class YellLoudFragment extends Fragment {
 
                 new DownloadMessages().execute();
 
+            }
+        });
+
+        mMessageBox = (EditText) v.findViewById(R.id.editText);
+        mMessageBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                Log.d("keycode",Integer.toString(i));
+                if(i == 5){
+                    new SendMessage().execute(textView.getText().toString());
+                }
+
+                return false;
             }
         });
 
@@ -122,8 +141,6 @@ public class YellLoudFragment extends Fragment {
         String mID;
 
         private Button mLike, mDislike;
-
-
 
         public HeckHolder(View itemView){
             super(itemView);
@@ -201,7 +218,7 @@ public class YellLoudFragment extends Fragment {
             try {
                 String url = Uri.parse("https://www.stepoutnyc.com/chitchat")
                         .buildUpon()
-                        .appendQueryParameter("key","champlainrocks1878")
+                        .appendQueryParameter("key",API_KEY)
                         .build()
                         .toString();
                 String strinnn = getUrlString(url);
@@ -243,36 +260,41 @@ public class YellLoudFragment extends Fragment {
 
     /* Yell a HeckingShout to the server */
     private class SendMessage extends AsyncTask<String, Void, String>{
-        protected String doInBackground(String... id) {
+        protected String doInBackground(String... message) {
             try {
-                /* Build new JSONObject from the HeckingShout */
-                JSONObject newShout = new JSONObject();
-                HeckingShout shout = mShouts.get(Integer.getInteger(id[0]));
-                newShout.put("_id", shout.getMessageID());
-                newShout.put("date", shout.getMessageTimestamp());
-                newShout.put("message", shout.getMessageContent());
-                newShout.put("likes", 0);
-                newShout.put("dislikes", 0);
-
                 /* Build URL string, strUrl */
-                String url = Uri.parse("https://www.stepoutnyc.com/chitchat")
+                String urlSpec = Uri.parse("https://www.stepoutnyc.com/chitchat")
                         .buildUpon()
-                        .appendQueryParameter("key","champlainrocks1878")
+                        .appendQueryParameter("key",API_KEY)
+                        .appendQueryParameter("message",message[0])
+                        .appendQueryParameter("client",CLIENT_YOU_BETTER_WANT_IT)
                         .build()
                         .toString();
-                String strUrl = getUrlString(url);
-                Log.d("JSON MESSAGES BODY", strUrl);
 
-                /* Load the JSONArray of existing HeckingShouts from the URL string, strUrl */
-                JSONObject json = new JSONObject(strUrl);
-                JSONArray shouts = json.getJSONArray("messages");
+                URL url = new URL(urlSpec);
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                connection.setRequestMethod("POST");
+                try {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    InputStream in = connection.getInputStream();
+                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        throw new IOException(connection.getResponseMessage() +
+                                ": with " +
+                                urlSpec);
+                    }
+                    int bytesRead = 0;
+                    byte[] buffer = new byte[1024];
+                    while ((bytesRead = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, bytesRead);
+                    }
+                    out.close();
+                    return new String(out.toByteArray());
+                } finally {
+                    connection.disconnect();
+                }
 
-                /* Yell the new HeckingShout into the existing JSONArray  on the server */
-                shouts.put(newShout);
 
-            } catch(JSONException je){
-                // JSONException thrown
-                Log.d("YellLoudFragment:", "JSONException thrown.");
+
             } catch(IOException io) {
                 // IOException thrown
                 Log.d("YellLoudFragment:","IOException thrown.");
@@ -282,8 +304,10 @@ public class YellLoudFragment extends Fragment {
         }
 
         protected void onPostExecute(String str){
-            mHingAdapter.notifyDataSetChanged(); // Does this refresh the local feed?
-            mListHoldyRefresher.setRefreshing(false);
+            mListHoldyRefresher.setRefreshing(true);
+            new DownloadMessages().execute();
+
+            mListHoldyRefresher.setRefreshing(true);
         }
     }
 
